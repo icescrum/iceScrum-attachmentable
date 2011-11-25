@@ -50,19 +50,10 @@ grails.project.dependency.resolution = {
 
     dependencies {
       // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-      runtime 'mysql:mysql-connector-java:5.1.5'
+      //runtime 'mysql:mysql-connector-java:5.1.5'
    }
 
     plugins {
-        compile ':maven-publisher:0.7.5'
-    }
-}
-
-grails.project.dependency.distribution = {
-    remoteRepository(id: "pluginsSnapshot", url: "http://repo.icescrum.org/artifactory/plugins-snapshot-local/") {
-        authentication username: "admin", password: ""
-    }
-    remoteRepository(id: "pluginsRelease", url: "http://repo.icescrum.org/artifactory/plugins-release-local/") {
-        authentication username: "admin", password: ""
+        compile ':maven-publisher:0.8.1'
     }
 }
