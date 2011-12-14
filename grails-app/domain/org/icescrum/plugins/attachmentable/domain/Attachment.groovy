@@ -1,5 +1,5 @@
 package org.icescrum.plugins.attachmentable.domain
-class Attachment {
+class Attachment implements Serializable {
 
     // file
     String name

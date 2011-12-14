@@ -1,7 +1,7 @@
 package org.icescrum.plugins.attachmentable.domain
 import grails.util.GrailsNameUtils
 
-class AttachmentLink {
+class AttachmentLink implements Serializable {
 
     Long attachmentRef
     String attachmentRefClass
