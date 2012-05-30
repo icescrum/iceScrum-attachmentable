@@ -1,4 +1,4 @@
-<plugin name='icescrum-attachmentable' version='0.2' grailsVersion='1.3 &gt; *'>
+<plugin name='icescrum-attachmentable' version='0.3' grailsVersion='1.3 &gt; *'>
   <author>Vincent Barrier</author>
   <authorEmail>vincent.barrier@icescrum.com</authorEmail>
   <title>iceScrum attachmentable plugin</title>
