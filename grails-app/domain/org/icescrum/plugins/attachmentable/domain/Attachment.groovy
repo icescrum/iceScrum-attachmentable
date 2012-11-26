@@ -8,6 +8,10 @@ class Attachment implements Serializable {
     Long length
     Date dateCreated
 
+    //For generic cloud storage
+    String url
+    String provider
+
     // poster
     String posterClass
     Long posterId
@@ -23,11 +27,13 @@ class Attachment implements Serializable {
         length min: 0L
         posterClass blank: false
         posterId min: 0L
+        url nullable:true
+        provider nullable:true
     }
 
     static mapping = {
-      cache true
-      table 'attachmentable_attachment'
+        cache true
+        table 'attachmentable_attachment'
     }
 
     String toString() {
@@ -38,11 +44,11 @@ class Attachment implements Serializable {
         ext ? "$name.$ext" : "$name"
     }
 
-   def getPoster() {
-      // handle proxied class names
-      def i = posterClass.indexOf('_$$_javassist')
-      if (i > -1)
-        posterClass = posterClass[0..i - 1]
-      getClass().classLoader.loadClass(posterClass).get(posterId)
+    def getPoster() {
+        // handle proxied class names
+        def i = posterClass.indexOf('_$$_javassist')
+        if (i > -1)
+            posterClass = posterClass[0..i - 1]
+        getClass().classLoader.loadClass(posterClass).get(posterId)
     }
 }

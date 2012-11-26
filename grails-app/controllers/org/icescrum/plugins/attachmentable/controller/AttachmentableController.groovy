@@ -27,23 +27,28 @@ import org.icescrum.plugins.attachmentable.domain.Attachment
 
 class AttachmentableController {
 
-  def attachmentableService
+    def attachmentableService
 
-  def download = {
-    Attachment attachment = Attachment.get(params.id as Long)
-    if (attachment) {
-        File file = attachmentableService.getFile(attachment)
+    def download = {
+        Attachment attachment = Attachment.get(params.id as Long)
+        if (attachment) {
+            if (attachment.url){
+                redirect(url: "${attachment.url}")
+                return
+            }else{
+                File file = attachmentableService.getFile(attachment)
 
-        if (file.exists()) {
-            String filename = attachment.filename
-            ['Content-disposition': "attachment;filename=\"$filename\"",'Cache-Control': 'private','Pragma': ''].each {k, v ->
-                response.setHeader(k, v)
+                if (file.exists()) {
+                    String filename = attachment.filename
+                    ['Content-disposition': "attachment;filename=\"$filename\"",'Cache-Control': 'private','Pragma': ''].each {k, v ->
+                        response.setHeader(k, v)
+                    }
+                    response.contentType = attachment.contentType
+                    response.outputStream << file.newInputStream()
+                    return
+                }
             }
-            response.contentType = attachment.contentType
-            response.outputStream << file.newInputStream()
-            return
         }
+        response.status = HttpServletResponse.SC_NOT_FOUND
     }
-    response.status = HttpServletResponse.SC_NOT_FOUND
-  }
 }
