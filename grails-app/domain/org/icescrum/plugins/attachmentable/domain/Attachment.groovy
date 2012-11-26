@@ -27,12 +27,13 @@ class Attachment implements Serializable {
         length min: 0L
         posterClass blank: false
         posterId min: 0L
-        url nullable:true
+        url(maxSize: 1000, nullable: true)
         provider nullable:true
     }
 
     static mapping = {
         cache true
+        url length: 1000
         table 'attachmentable_attachment'
     }
 
