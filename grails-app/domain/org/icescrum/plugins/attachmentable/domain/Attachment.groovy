@@ -19,6 +19,8 @@ class Attachment implements Serializable {
     // input name
     String inputName
 
+    static transients = ['previewable']
+
     static constraints = {
         name nullable: false, blank: false
         ext nullable: true, blank: true
@@ -43,6 +45,10 @@ class Attachment implements Serializable {
 
     def getFilename() {
         ext ? "$name.$ext" : "$name"
+    }
+
+    def getPreviewable() {
+        return this.contentType?.contains('image/') && this.url == null
     }
 
     def getPoster() {
