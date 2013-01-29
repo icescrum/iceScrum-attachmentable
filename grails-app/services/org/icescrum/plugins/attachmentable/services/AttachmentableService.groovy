@@ -76,7 +76,8 @@ class AttachmentableService {
                 //save the file on disk
                 def diskFile = new File(getFileDir(delegate),"${a.id + (a.ext?'.'+a.ext:'')}")
                 FileUtils.moveFile(file,diskFile)
-
+                a.contentType = new MimetypesFileTypeMap().getContentType(diskFile)?:a.contentType
+                a.save()
                 try {
                     delegate.onAddAttachment(a)
                 } catch (MissingMethodException e) {}
