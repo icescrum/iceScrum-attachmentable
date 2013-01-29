@@ -37,8 +37,6 @@ class AttachmentableService {
 
     static transitional = true
 
-    def grailsApplication
-
     def addAttachment(def poster, def delegate, def file, def originalName = null) {
 
         if (delegate.id == null) throw new AttachmentException("You must save the entity [${delegate}] before calling addAttachment")
@@ -60,6 +58,12 @@ class AttachmentableService {
                 url: file instanceof Map ? file.url : null,
                 provider: file instanceof Map ? file.provider : null,
                 contentType: file instanceof File ? new MimetypesFileTypeMap().getContentType(originalName?:file.name) : null)
+
+        if (log.debugEnabled){
+            String filename = originalName?:file.name
+            log.debug(new MimetypesFileTypeMap().getContentType(a.id + (a.ext?'.'+a.ext:'')).toString())
+            log.debug(new MimetypesFileTypeMap().getContentType(filename).toString())
+        }
 
         if (!a.validate()) throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
         a.save()
