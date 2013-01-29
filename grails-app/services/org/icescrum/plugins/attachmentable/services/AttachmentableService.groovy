@@ -59,7 +59,7 @@ class AttachmentableService {
                 length: file instanceof File ? file.length() : file.length,
                 url: file instanceof Map ? file.url : null,
                 provider: file instanceof Map ? file.provider : null,
-                contentType: file instanceof File ? new MimetypesFileTypeMap().getContentType(file) : null)
+                contentType: file instanceof File ? new MimetypesFileTypeMap().getContentType(originalName?:file.name) : null)
 
         if (!a.validate()) throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
         a.save()
@@ -76,8 +76,6 @@ class AttachmentableService {
                 //save the file on disk
                 def diskFile = new File(getFileDir(delegate),"${a.id + (a.ext?'.'+a.ext:'')}")
                 FileUtils.moveFile(file,diskFile)
-                a.contentType = new MimetypesFileTypeMap().getContentType(diskFile)?:a.contentType
-                a.save()
                 try {
                     delegate.onAddAttachment(a)
                 } catch (MissingMethodException e) {}
