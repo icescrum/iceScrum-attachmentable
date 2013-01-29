@@ -33,6 +33,9 @@ import org.icescrum.plugins.attachmentable.interfaces.AttachmentException
 import org.icescrum.plugins.attachmentable.domain.Attachment
 import org.icescrum.plugins.attachmentable.domain.AttachmentLink
 
+import javax.servlet.ServletContext
+import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+
 class AttachmentableService {
 
     static transitional = true
@@ -49,20 +52,22 @@ class AttachmentableService {
             if (!file?.length()) throw new AttachmentException("Error file : ${file.getName()} is empty (${file.getAbsolutePath()})")
         }
 
+        String filename = originalName?:file.name
+
         def a = new Attachment(posterId: poster.id,
                 posterClass: posterClass,
                 inputName: originalName?:file.name,
-                name: FilenameUtils.getBaseName(originalName?:file.name),
-                ext: FilenameUtils.getExtension(originalName?:file.name),
+                name: FilenameUtils.getBaseName(filename),
+                ext: FilenameUtils.getExtension(filename),
                 length: file instanceof File ? file.length() : file.length,
                 url: file instanceof Map ? file.url : null,
                 provider: file instanceof Map ? file.provider : null,
-                contentType: file instanceof File ? new MimetypesFileTypeMap().getContentType(originalName?:file.name) : null)
+                contentType: file instanceof File ? SCH.servletContext.getMimeType(filename) : null)
 
         if (log.debugEnabled){
-            String filename = originalName?:file.name
-            log.debug(new MimetypesFileTypeMap().getContentType(a.id + (a.ext?'.'+a.ext:'')).toString())
-            log.debug(new MimetypesFileTypeMap().getContentType(filename).toString())
+            SCH.servletContext.getMimeType(filename)
+            log.debug(SCH.servletContext.getMimeType(filename))
+            log.debug(SCH.servletContext.getMimeType(a.id + (a.ext?'.'+a.ext:'')))
         }
 
         if (!a.validate()) throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
