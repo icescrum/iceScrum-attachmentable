@@ -64,12 +64,6 @@ class AttachmentableService {
                 provider: file instanceof Map ? file.provider : null,
                 contentType: file instanceof File ? SCH.servletContext.getMimeType(filename) : null)
 
-        if (log.debugEnabled){
-            SCH.servletContext.getMimeType(filename)
-            log.debug(SCH.servletContext.getMimeType(filename))
-            log.debug(SCH.servletContext.getMimeType(a.id + (a.ext?'.'+a.ext:'')))
-        }
-
         if (!a.validate()) throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
         a.save()
 
