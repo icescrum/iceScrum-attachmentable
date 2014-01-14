@@ -22,11 +22,13 @@ class AttachmentLink implements Serializable {
 
     static namedQueries = {
       getAttachments {instance ->
-        projections {
-          property "attachment"
-        }
-        eq "attachmentRef", instance?.id
-        eq 'type', GrailsNameUtils.getPropertyName(instance.class)
+          createAlias("attachment", "a")
+          projections {
+              property "attachment"
+          }
+          eq "attachmentRef", instance?.id
+          eq 'type', GrailsNameUtils.getPropertyName(instance.class)
+          order("a.dateCreated", "desc")
       }
 
       getTotalAttachments {instance ->
