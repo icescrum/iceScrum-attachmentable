@@ -23,10 +23,9 @@
 
 package org.icescrum.plugins.attachmentable.services
 
-import javax.activation.MimetypesFileTypeMap
+import grails.util.Holders
 import org.apache.commons.io.FilenameUtils
 import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.apache.commons.io.FileUtils
 import org.icescrum.plugins.attachmentable.interfaces.AttachmentException
@@ -109,9 +108,9 @@ class AttachmentableService {
     }
 
     private getFileDir(def object){
-        def dir = CH.config.grails.attachmentable.baseDir
-        if (CH.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir")
-            dir = "${dir}${CH.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir"(object)}"
+        def dir = Holders.config.grails.attachmentable.baseDir
+        if (Holders.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir")
+            dir = "${dir}${Holders.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir"(object)}"
         def fileDir = new File(dir)
         fileDir.mkdirs()
         return fileDir
