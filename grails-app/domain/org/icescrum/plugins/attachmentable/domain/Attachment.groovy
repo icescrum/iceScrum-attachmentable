@@ -58,4 +58,19 @@ class Attachment implements Serializable {
             posterClass = posterClass[0..i - 1]
         getClass().classLoader.loadClass(posterClass).get(posterId)
     }
+
+    def xml(builder) {
+        builder.attachment(){
+            ext(this.ext)
+            length(this.length)
+            posterId(this.posterId)
+            posterClass(this.posterClass)
+            dateCreated(this.dateCreated)
+            url { builder.mkp.yieldUnescaped("<![CDATA[${this.url}]]>") }
+            name { builder.mkp.yieldUnescaped("<![CDATA[${this.name}]]>") }
+            provider { builder.mkp.yieldUnescaped("<![CDATA[${this.provider}]]>") }
+            inputName { builder.mkp.yieldUnescaped("<![CDATA[${this.inputName}]]>") }
+            contentType { builder.mkp.yieldUnescaped("<![CDATA[${this.contentType}]]>") }
+        }
+    }
 }
