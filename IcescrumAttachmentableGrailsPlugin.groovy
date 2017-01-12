@@ -29,7 +29,7 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
     // the plugin version
-    def version = "1.0.1"
+    def version = "1.0.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // the other plugins this plugin depends on
