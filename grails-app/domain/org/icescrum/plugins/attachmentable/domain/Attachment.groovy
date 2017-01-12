@@ -60,17 +60,17 @@ class Attachment implements Serializable {
     }
 
     def xml(builder) {
-        builder.attachment(){
-            ext(this.ext)
-            length(this.length)
-            posterId(this.posterId)
-            posterClass(this.posterClass)
-            dateCreated(this.dateCreated)
-            url { builder.mkp.yieldUnescaped("<![CDATA[${this.url}]]>") }
-            name { builder.mkp.yieldUnescaped("<![CDATA[${this.name}]]>") }
-            provider { builder.mkp.yieldUnescaped("<![CDATA[${this.provider}]]>") }
-            inputName { builder.mkp.yieldUnescaped("<![CDATA[${this.inputName}]]>") }
-            contentType { builder.mkp.yieldUnescaped("<![CDATA[${this.contentType}]]>") }
+        builder.attachment(id:this.id){
+            builder.ext(this.ext?:'')
+            builder.length(this.length)
+            builder.posterId(this.posterId)
+            builder.posterClass(this.posterClass)
+            builder.dateCreated(this.dateCreated)
+            builder.url { builder.mkp.yieldUnescaped("<![CDATA[${this.url?:''}]]>") }
+            builder.name { builder.mkp.yieldUnescaped("<![CDATA[${this.name}]]>") }
+            builder.provider { builder.mkp.yieldUnescaped("<![CDATA[${this.provider?:''}]]>") }
+            builder.inputName { builder.mkp.yieldUnescaped("<![CDATA[${this.inputName}]]>") }
+            builder.contentType { builder.mkp.yieldUnescaped("<![CDATA[${this.contentType?:''}]]>") }
         }
     }
 }
