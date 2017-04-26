@@ -31,14 +31,13 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.icescrum.plugins.attachmentable.domain.Attachment
 import org.icescrum.plugins.attachmentable.domain.AttachmentLink
-import org.icescrum.plugins.attachmentable.interfaces.AttachmentException
 
 class AttachmentableService {
 
     def addAttachment(def poster, def delegate, def file, def originalName = null) {
 
         if (delegate.id == null) {
-            throw new AttachmentException("You must save the entity [${delegate}] before calling addAttachment")
+            throw new RuntimeException("You must save the entity [${delegate}] before calling addAttachment")
         }
 
         def posterClass = poster.class.name
@@ -48,7 +47,7 @@ class AttachmentableService {
         }
 
         if (file instanceof File && !file?.length()) {
-            throw new AttachmentException("Error file : ${file.getName()} is empty (${file.getAbsolutePath()})")
+            throw new RuntimeException("Error file : ${file.getName()} is empty (${file.getAbsolutePath()})")
         }
 
         String filename = originalName ?: file.name
@@ -64,7 +63,7 @@ class AttachmentableService {
                 contentType: file instanceof File ? SCH.servletContext.getMimeType(filename.toLowerCase()) : null)
 
         if (!attachment.validate()) {
-            throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
+            throw new RuntimeException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
         }
         attachment.save()
 
@@ -78,16 +77,12 @@ class AttachmentableService {
         link.save()
 
         if (file instanceof File) {
+            // Save the file on disk
+            def diskFile = new File(getFileDir(delegate), "${attachment.id + (attachment.ext ? '.' + attachment.ext : '')}")
+            FileUtils.moveFile(file, diskFile)
             try {
-                // Save the file on disk
-                def diskFile = new File(getFileDir(delegate), "${attachment.id + (attachment.ext ? '.' + attachment.ext : '')}")
-                FileUtils.moveFile(file, diskFile)
-                try {
-                    delegate.onAddAttachment(attachment)
-                } catch (MissingMethodException e) {}
-            } catch (Exception e) {
-                throw new AttachmentException(e.getMessage())
-            }
+                delegate.onAddAttachment(attachment)
+            } catch (MissingMethodException e) {}
         }
         return delegate
     }
