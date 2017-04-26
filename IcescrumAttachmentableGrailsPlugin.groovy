@@ -28,7 +28,7 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    def version = "1.0.2"
+    def version = "1.0.3"
     def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
