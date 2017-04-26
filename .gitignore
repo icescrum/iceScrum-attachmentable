@@ -1,6 +1,9 @@
 *.iml
+*.ids
+*.project
+target/
 
-ompiled source #
+# Compiled source #
 ###################
 *.com
 *.class
@@ -11,7 +14,7 @@ ompiled source #
 
 # OS generated files #
 ######################
-.DS_Store?
+.DS_Store
 ehthumbs.db
 Icon?
 Thumbs.db
