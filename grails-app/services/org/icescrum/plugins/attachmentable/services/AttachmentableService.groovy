@@ -23,39 +23,39 @@
 
 package org.icescrum.plugins.attachmentable.services
 
-import grails.util.Holders
-import org.apache.commons.io.FilenameUtils
 import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import grails.util.Holders
 import org.apache.commons.io.FileUtils
-import org.icescrum.plugins.attachmentable.interfaces.AttachmentException
+import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.icescrum.plugins.attachmentable.domain.Attachment
 import org.icescrum.plugins.attachmentable.domain.AttachmentLink
-
-import javax.servlet.ServletContext
-import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+import org.icescrum.plugins.attachmentable.interfaces.AttachmentException
 
 class AttachmentableService {
 
-    static transitional = true
-
     def addAttachment(def poster, def delegate, def file, def originalName = null) {
 
-        if (delegate.id == null) throw new AttachmentException("You must save the entity [${delegate}] before calling addAttachment")
+        if (delegate.id == null) {
+            throw new AttachmentException("You must save the entity [${delegate}] before calling addAttachment")
+        }
 
         def posterClass = poster.class.name
         def i = posterClass.indexOf('_$$_javassist')
-        if (i > -1) posterClass = posterClass[0..i - 1]
-
-        if (file instanceof File){
-            if (!file?.length()) throw new AttachmentException("Error file : ${file.getName()} is empty (${file.getAbsolutePath()})")
+        if (i > -1) {
+            posterClass = posterClass[0..i - 1]
         }
 
-        String filename = originalName?:file.name
+        if (file instanceof File && !file?.length()) {
+            throw new AttachmentException("Error file : ${file.getName()} is empty (${file.getAbsolutePath()})")
+        }
 
-        def a = new Attachment(posterId: poster.id,
+        String filename = originalName ?: file.name
+
+        def attachment = new Attachment(posterId: poster.id,
                 posterClass: posterClass,
-                inputName: originalName?:file.name,
+                inputName: originalName ?: file.name,
                 name: FilenameUtils.getBaseName(filename),
                 ext: FilenameUtils.getExtension(filename),
                 length: file instanceof File ? file.length() : file.length,
@@ -63,65 +63,67 @@ class AttachmentableService {
                 provider: file instanceof Map ? file.provider : null,
                 contentType: file instanceof File ? SCH.servletContext.getMimeType(filename.toLowerCase()) : null)
 
-        if (!a.validate()) throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
-        a.save()
+        if (!attachment.validate()) {
+            throw new AttachmentException("Cannot create attachment for arguments [$poster, $file], they are invalid.")
+        }
+        attachment.save()
 
         def delegateClass = delegate.class.name
         i = delegateClass.indexOf('_$$_javassist')
-        if (i > -1) delegateClass = delegateClass[0..i - 1]
+        if (i > -1) {
+            delegateClass = delegateClass[0..i - 1]
+        }
 
-        def link = new AttachmentLink(attachment: a, attachmentRef: delegate.id, type: GrailsNameUtils.getPropertyName(delegate.class), attachmentRefClass:delegateClass)
+        def link = new AttachmentLink(attachment: attachment, attachmentRef: delegate.id, type: GrailsNameUtils.getPropertyName(delegate.class), attachmentRefClass: delegateClass)
         link.save()
 
-        if (file instanceof File){
+        if (file instanceof File) {
             try {
-                //save the file on disk
-                def diskFile = new File(getFileDir(delegate),"${a.id + (a.ext?'.'+a.ext:'')}")
-                FileUtils.moveFile(file,diskFile)
+                // Save the file on disk
+                def diskFile = new File(getFileDir(delegate), "${attachment.id + (attachment.ext ? '.' + attachment.ext : '')}")
+                FileUtils.moveFile(file, diskFile)
                 try {
-                    delegate.onAddAttachment(a)
+                    delegate.onAddAttachment(attachment)
                 } catch (MissingMethodException e) {}
-
-            }catch(Exception e){
+            } catch (Exception e) {
                 throw new AttachmentException(e.getMessage())
             }
         }
         return delegate
     }
 
-    def removeAttachment(Attachment attachment, def delegate){
-
-        if (!attachment.url){
-            def diskFile = new File(getFileDir(delegate),"${attachment.id + (attachment.ext?'.'+attachment.ext:'')}")
+    def removeAttachment(Attachment attachment, def delegate) {
+        if (!attachment.url) {
+            def diskFile = new File(getFileDir(delegate), "${attachment.id + (attachment.ext ? '.' + attachment.ext : '')}")
             diskFile.delete()
             try {
                 delegate.onRemoveAttachment(attachment)
             } catch (MissingMethodException e) {}
         }
-
         return delegate
     }
 
-    def removeAttachmentDir(def delegate){
+    def removeAttachmentDir(def delegate) {
         getFileDir(delegate).deleteDir()
         return delegate
     }
 
-    private getFileDir(def object){
+    private getFileDir(def object) {
         def dir = Holders.config.grails.attachmentable.baseDir
-        if (Holders.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir")
+        if (Holders.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir") {
             dir = "${dir}${Holders.config.grails.attachmentable?."${GrailsClassUtils.getShortName(object.class).toLowerCase()}Dir"(object)}"
+        }
         def fileDir = new File(dir)
         fileDir.mkdirs()
         return fileDir
     }
 
-    def getFile(def attachment){
+    def getFile(def attachment) {
         def link = AttachmentLink.findByAttachment(attachment)
         def delegate = getClass().classLoader.loadClass(link.attachmentRefClass).get(link.attachmentRef)
-        def diskFile = new File(getFileDir(delegate),"${attachment.id + (attachment.ext?'.'+attachment.ext:'')}")
-        if (!diskFile){
-            throw new  FileNotFoundException()
+        def diskFile = new File(getFileDir(delegate), "${attachment.id + (attachment.ext ? '.' + attachment.ext : '')}")
+        if (!diskFile) {
+            throw new FileNotFoundException()
         }
         return diskFile
     }

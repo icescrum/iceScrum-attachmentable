@@ -1,4 +1,5 @@
 package org.icescrum.plugins.attachmentable.domain
+
 import grails.util.GrailsNameUtils
 
 class AttachmentLink implements Serializable {
@@ -10,33 +11,33 @@ class AttachmentLink implements Serializable {
     static belongsTo = [attachment: Attachment]
 
     static constraints = {
-        attachmentRef min:0L
-        attachmentRefClass blank:false
-		type blank:false
+        attachmentRef min: 0L
+        attachmentRefClass blank: false
+        type blank: false
     }
 
     static mapping = {
-      table 'attachmentable_attachmentlink'
-      cache true
+        table 'attachmentable_attachmentlink'
+        cache true
     }
 
     static namedQueries = {
-      getAttachments {instance ->
-          createAlias("attachment", "a")
-          projections {
-              property "attachment"
-          }
-          eq "attachmentRef", instance?.id
-          eq 'type', GrailsNameUtils.getPropertyName(instance.class)
-          order("a.dateCreated", "desc")
-      }
-
-      getTotalAttachments {instance ->
-        projections {
-          rowCount()
+        getAttachments { instance ->
+            createAlias("attachment", "a")
+            projections {
+                property "attachment"
+            }
+            eq "attachmentRef", instance?.id
+            eq 'type', GrailsNameUtils.getPropertyName(instance.class)
+            order("a.dateCreated", "desc")
         }
-        eq "attachmentRef", instance?.id
-        eq 'type', GrailsNameUtils.getPropertyName(instance.class)
-      }
+
+        getTotalAttachments { instance ->
+            projections {
+                rowCount()
+            }
+            eq "attachmentRef", instance?.id
+            eq 'type', GrailsNameUtils.getPropertyName(instance.class)
+        }
     }
 }

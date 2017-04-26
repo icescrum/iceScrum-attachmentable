@@ -22,8 +22,9 @@
  */
 package org.icescrum.plugins.attachmentable.controller
 
-import javax.servlet.http.HttpServletResponse
 import org.icescrum.plugins.attachmentable.domain.Attachment
+
+import javax.servlet.http.HttpServletResponse
 
 class AttachmentableController {
 
@@ -32,15 +33,14 @@ class AttachmentableController {
     def download = {
         Attachment attachment = Attachment.get(params.id as Long)
         if (attachment) {
-            if (attachment.url){
+            if (attachment.url) {
                 redirect(url: "${attachment.url}")
                 return
-            }else{
+            } else {
                 File file = attachmentableService.getFile(attachment)
-
                 if (file.exists()) {
                     String filename = attachment.filename
-                    ['Content-disposition': "attachment;filename=\"$filename\"",'Cache-Control': 'private','Pragma': ''].each {k, v ->
+                    ['Content-disposition': "attachment;filename=\"$filename\"", 'Cache-Control': 'private', 'Pragma': ''].each { k, v ->
                         response.setHeader(k, v)
                     }
                     response.contentType = attachment.contentType

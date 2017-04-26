@@ -23,8 +23,8 @@
 
 package org.icescrum.plugins.attachmentable.interfaces
 
-class AttachmentException extends RuntimeException{
+class AttachmentException extends RuntimeException {
     AttachmentException(String msg) {
-		super(msg)
-	}
+        super(msg)
+    }
 }

@@ -1,22 +1,23 @@
 package org.icescrum.plugins.attachmentable.domain
+
 class Attachment implements Serializable {
 
-    // file
+    // File
     String name
     String ext
     String contentType
     Long length
     Date dateCreated
 
-    //For generic cloud storage
+    // For generic cloud storage
     String url
     String provider
 
-    // poster
+    // Poster
     String posterClass
     Long posterId
 
-    // input name
+    // Input name
     String inputName
 
     static transients = ['previewable']
@@ -24,13 +25,13 @@ class Attachment implements Serializable {
     static constraints = {
         name nullable: false, blank: false
         ext nullable: true, blank: true
-        inputName nullable:false, blank: false
+        inputName nullable: false, blank: false
         contentType nullable: true, blank: true
         length min: 0L
         posterClass blank: false
         posterId min: 0L
         url(maxSize: 1000, nullable: true)
-        provider nullable:true
+        provider nullable: true
     }
 
     static mapping = {
@@ -40,11 +41,11 @@ class Attachment implements Serializable {
     }
 
     String toString() {
-        filename
+        return filename
     }
 
     def getFilename() {
-        ext ? "$name.$ext" : "$name"
+        return ext ? "$name.$ext" : "$name"
     }
 
     def getPreviewable() {
@@ -52,25 +53,26 @@ class Attachment implements Serializable {
     }
 
     def getPoster() {
-        // handle proxied class names
+        // Handle proxied class names
         def i = posterClass.indexOf('_$$_javassist')
-        if (i > -1)
+        if (i > -1) {
             posterClass = posterClass[0..i - 1]
-        getClass().classLoader.loadClass(posterClass).get(posterId)
+        }
+        return getClass().classLoader.loadClass(posterClass).get(posterId)
     }
 
     def xml(builder) {
-        builder.attachment(id:this.id){
-            builder.ext(this.ext?:'')
+        builder.attachment(id: this.id) {
+            builder.ext(this.ext ?: '')
             builder.length(this.length)
             builder.posterId(this.posterId)
             builder.posterClass(this.posterClass)
             builder.dateCreated(this.dateCreated)
-            builder.url { builder.mkp.yieldUnescaped("<![CDATA[${this.url?:''}]]>") }
+            builder.url { builder.mkp.yieldUnescaped("<![CDATA[${this.url ?: ''}]]>") }
             builder.name { builder.mkp.yieldUnescaped("<![CDATA[${this.name}]]>") }
-            builder.provider { builder.mkp.yieldUnescaped("<![CDATA[${this.provider?:''}]]>") }
+            builder.provider { builder.mkp.yieldUnescaped("<![CDATA[${this.provider ?: ''}]]>") }
             builder.inputName { builder.mkp.yieldUnescaped("<![CDATA[${this.inputName}]]>") }
-            builder.contentType { builder.mkp.yieldUnescaped("<![CDATA[${this.contentType?:''}]]>") }
+            builder.contentType { builder.mkp.yieldUnescaped("<![CDATA[${this.contentType ?: ''}]]>") }
         }
     }
 }

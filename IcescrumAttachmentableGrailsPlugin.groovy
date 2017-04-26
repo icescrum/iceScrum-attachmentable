@@ -28,78 +28,59 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    // the plugin version
     def version = "1.0.2"
-    // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.4 > *"
-    // the other plugins this plugin depends on
-    def dependsOn = [:]
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-            "grails-app/views/error.gsp"
-    ]
-
-    // TODO Fill in these fields
+    def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
     def title = "iceScrum attachmentable plugin"
     def description = '''Attach file to your domain class in a generic manner (without MultipartFile or Ajax)
            if you don't need to customize ajax/multipartFile -> Try Attachmentable plugin'''
 
-    // URL to the plugin's documentation
-    def documentation = "http://icescrum.org/plugin/attachmentable"
-
     def doWithSpring = {
         attachmentsBaseDir application
     }
 
     def doWithDynamicMethods = { ctx ->
-        AttachmentableService service = ctx.getBean('attachmentableService')
-
+        AttachmentableService attachmentableService = ctx.getBean('attachmentableService')
         for (domainClass in application.domainClasses) {
             if (Attachmentable.class.isAssignableFrom(domainClass.clazz)) {
                 domainClass.clazz.metaClass {
-
-                    addAttachment{ poster, def file, String originalName = null ->
-                        service.addAttachment(poster, delegate, file, originalName)
+                    addAttachment { poster, def file, String originalName = null ->
+                        attachmentableService.addAttachment(poster, delegate, file, originalName)
                     }
-
-                    addAttachments{ poster, def tmpFiles ->
+                    addAttachments { poster, def tmpFiles ->
                         tmpFiles.each { tmpFile ->
-                            if (tmpFile instanceof File){
+                            if (tmpFile instanceof File) {
                                 addAttachment(poster, tmpFile)
-                            }
-                            else{
+                            } else {
                                 addAttachment(poster, tmpFile.url ? tmpFile : tmpFile.file, tmpFile.filename)
                             }
                         }
                     }
-
                     removeAttachment { Attachment a ->
-                        service.removeAttachment(a,delegate)
+                        attachmentableService.removeAttachment(a, delegate)
                         AttachmentLink.findAllByAttachment(a)*.delete()
-                        a.delete(flush:true)
+                        a.delete(flush: true)
                     }
-
                     removeAttachment { Long id ->
-                        def a = Attachment.load(id)
-                        if (a) removeAttachment(a)
+                        def attachment = Attachment.load(id)
+                        if (attachment) {
+                            removeAttachment(attachment)
+                        }
                     }
-
                     removeAllAttachments {
-                        def delDir = delegate.attachments?.findAll{ it.url != null }?.size() > 0 ?: false
-                        delegate.attachments?.each{ Attachment a ->
+                        def delDir = delegate.attachments?.findAll { it.url != null }?.size() > 0 ?: false
+                        delegate.attachments?.each { Attachment a ->
                             removeAttachment(a)
                         }
-                        if (delDir)
-                            service.removeAttachmentDir(delegate)
+                        if (delDir) {
+                            attachmentableService.removeAttachmentDir(delegate)
+                        }
                     }
-
-                    getAttachments = {->
+                    getAttachments = { ->
                         AttachmentLink.getAttachments(delegate).list()
                     }
-
-                    getTotalAttachments = {->
+                    getTotalAttachments = { ->
                         AttachmentLink.getTotalAttachments(delegate).list()[0]
                     }
                 }
@@ -110,8 +91,8 @@ class IcescrumAttachmentableGrailsPlugin {
     private void attachmentsBaseDir(application) {
         def dir = application.config.grails.attachmentable?.baseDir
         if (!dir) {
-            String userHome  = System.properties.'user.home'
-            String appName   = application.metadata['app.name']
+            String userHome = System.properties.'user.home'
+            String appName = application.metadata['app.name']
             dir = new File(userHome, appName).canonicalPath
             application.config.grails.attachmentable.baseDir = dir
         }
