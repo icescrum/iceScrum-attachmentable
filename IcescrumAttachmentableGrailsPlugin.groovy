@@ -28,7 +28,7 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    def version = "1.0.3"
+    def version = "1.0.4"
     def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
@@ -46,7 +46,7 @@ class IcescrumAttachmentableGrailsPlugin {
             if (Attachmentable.class.isAssignableFrom(domainClass.clazz)) {
                 domainClass.clazz.metaClass {
                     addAttachment { poster, def file, String originalName = null ->
-                        attachmentableService.addAttachment(poster, delegate, file, originalName)
+                        return attachmentableService.addAttachment(poster, delegate, file, originalName)
                     }
                     addAttachments { poster, def tmpFiles ->
                         tmpFiles.each { tmpFile ->

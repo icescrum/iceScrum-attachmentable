@@ -34,7 +34,7 @@ import org.icescrum.plugins.attachmentable.domain.AttachmentLink
 
 class AttachmentableService {
 
-    def addAttachment(def poster, def delegate, def file, def originalName = null) {
+    Attachment addAttachment(def poster, def delegate, def file, def originalName = null) {
 
         if (delegate.id == null) {
             throw new RuntimeException("You must save the entity [${delegate}] before calling addAttachment")
@@ -84,7 +84,7 @@ class AttachmentableService {
                 delegate.onAddAttachment(attachment)
             } catch (MissingMethodException e) {}
         }
-        return delegate
+        return attachment
     }
 
     def removeAttachment(Attachment attachment, def delegate) {
