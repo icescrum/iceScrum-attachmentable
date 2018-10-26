@@ -28,7 +28,7 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    def version = "1.0.4"
+    def version = "1.0.7"
     def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
@@ -57,10 +57,8 @@ class IcescrumAttachmentableGrailsPlugin {
                             }
                         }
                     }
-                    removeAttachment { Attachment a ->
-                        attachmentableService.removeAttachment(a, delegate)
-                        AttachmentLink.findAllByAttachment(a)*.delete()
-                        a.delete(flush: true)
+                    removeAttachment { Attachment attachment ->
+                        attachmentableService.removeAttachment(attachment, delegate)
                     }
                     removeAttachment { Long id ->
                         def attachment = Attachment.load(id)
