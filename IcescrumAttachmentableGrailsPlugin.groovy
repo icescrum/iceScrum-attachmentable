@@ -24,11 +24,11 @@
 import org.icescrum.plugins.attachmentable.domain.Attachment
 import org.icescrum.plugins.attachmentable.domain.AttachmentLink
 import org.icescrum.plugins.attachmentable.interfaces.Attachmentable
-import org.icescrum.plugins.attachmentable.services.AttachmentableProxyService
+import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    def version = "1.0.8"
+    def version = "1.0.9"
     def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
@@ -41,12 +41,12 @@ class IcescrumAttachmentableGrailsPlugin {
     }
 
     def doWithDynamicMethods = { ctx ->
-        AttachmentableProxyService attachmentableProxyService = ctx.getBean('attachmentableProxyService')
+        AttachmentableService AttachmentableService = ctx.getBean('AttachmentableService')
         for (domainClass in application.domainClasses) {
             if (Attachmentable.class.isAssignableFrom(domainClass.clazz)) {
                 domainClass.clazz.metaClass {
                     addAttachment { poster, def file, String originalName = null ->
-                        return attachmentableProxyService.addAttachment(poster, delegate, file, originalName)
+                        return AttachmentableService.addAttachment(poster, delegate, file, originalName)
                     }
                     addAttachments { poster, def tmpFiles ->
                         tmpFiles.each { tmpFile ->
@@ -58,7 +58,7 @@ class IcescrumAttachmentableGrailsPlugin {
                         }
                     }
                     removeAttachment { Attachment attachment ->
-                        attachmentableProxyService.removeAttachment(attachment, delegate)
+                        AttachmentableService.removeAttachment(attachment, delegate)
                     }
                     removeAttachment { Long id ->
                         def attachment = Attachment.load(id)
@@ -72,7 +72,7 @@ class IcescrumAttachmentableGrailsPlugin {
                             removeAttachment(a)
                         }
                         if (delDir) {
-                            attachmentableProxyService.removeAttachmentDir(delegate)
+                            AttachmentableService.removeAttachmentDir(delegate)
                         }
                     }
                     getAttachments = { ->
