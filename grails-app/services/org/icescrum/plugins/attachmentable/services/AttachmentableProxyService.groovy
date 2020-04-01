@@ -32,7 +32,7 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.icescrum.plugins.attachmentable.domain.Attachment
 import org.icescrum.plugins.attachmentable.domain.AttachmentLink
 
-class AttachmentableService {
+class AttachmentableProxyService {
 
     Attachment addAttachment(def poster, def attachmentable, def file, def originalName = null) {
 
