@@ -28,7 +28,7 @@ import org.icescrum.plugins.attachmentable.services.AttachmentableService
 
 class IcescrumAttachmentableGrailsPlugin {
     def groupId = "org.icescrum"
-    def version = "1.0.9"
+    def version = "1.1.0"
     def grailsVersion = "2.5 > *"
     def author = "Vincent Barrier"
     def authorEmail = "vincent.barrier@icescrum.com"
@@ -41,12 +41,12 @@ class IcescrumAttachmentableGrailsPlugin {
     }
 
     def doWithDynamicMethods = { ctx ->
-        AttachmentableService AttachmentableService = ctx.getBean('AttachmentableService')
+        AttachmentableService attachmentableService = ctx.getBean('attachmentableService')
         for (domainClass in application.domainClasses) {
             if (Attachmentable.class.isAssignableFrom(domainClass.clazz)) {
                 domainClass.clazz.metaClass {
                     addAttachment { poster, def file, String originalName = null ->
-                        return AttachmentableService.addAttachment(poster, delegate, file, originalName)
+                        return attachmentableService.addAttachment(poster, delegate, file, originalName)
                     }
                     addAttachments { poster, def tmpFiles ->
                         tmpFiles.each { tmpFile ->
@@ -58,7 +58,7 @@ class IcescrumAttachmentableGrailsPlugin {
                         }
                     }
                     removeAttachment { Attachment attachment ->
-                        AttachmentableService.removeAttachment(attachment, delegate)
+                        attachmentableService.removeAttachment(attachment, delegate)
                     }
                     removeAttachment { Long id ->
                         def attachment = Attachment.load(id)
@@ -72,7 +72,7 @@ class IcescrumAttachmentableGrailsPlugin {
                             removeAttachment(a)
                         }
                         if (delDir) {
-                            AttachmentableService.removeAttachmentDir(delegate)
+                            attachmentableService.removeAttachmentDir(delegate)
                         }
                     }
                     getAttachments = { ->
